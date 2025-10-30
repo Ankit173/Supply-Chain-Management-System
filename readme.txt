@@ -1,3 +1,19 @@
+------------------------------------------------------
+SETUP AND INITIAL CONFIGURATION
+------------------------------------------------------
+
+1. COMPILATION: 
+   *Download This Whole Folder
+   *Check for username and password in the users.txt file
+   *Double click scms.exe if prompted Go to moreinfo and run anyway 
+   *Voila program is Running
+   
+  
+2. INITIAL USER SETUP:
+   * The program requires 'users.txt' for login.
+   * ACTION: navigate to file named **users.txt** in the program directory and add your first credentials (separated by a space):
+        Admin 1234
+   * Rerun the program and log in. Use Option 12 to add new users securely.
 ======================================================
 PROGRAM OVERVIEW: SUPPLY CHAIN MANAGEMENT SYSTEM (SCMS)
 ======================================================
@@ -22,21 +38,7 @@ SYSTEM FEATURES AND DATA MANAGEMENT
 * SKU REFERENCE: Options 3, 4, and 5 display a quick list of available SKUs and Names for easy identification.
 * BATCH DISPATCH: Option 9 supports processing multiple orders at once.
 
-------------------------------------------------------
-SETUP AND INITIAL CONFIGURATION
-------------------------------------------------------
 
-1. COMPILATION: 
-   Save the code as 'scms.c' and compile using GCC:
-        gcc scms.c -o scms
-   Run the executable:
-        ./scms
-
-2. INITIAL USER SETUP:
-   * The program requires 'users.txt' for login.
-   * ACTION: Create a file named **users.txt** in the program directory and add your first credentials (separated by a space):
-        Admin 1234
-   * Rerun the program and log in. Use Option 12 to add new users securely.
 
 ------------------------------------------------------
 MENU FUNCTIONALITY
