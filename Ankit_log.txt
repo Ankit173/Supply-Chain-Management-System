@@ -1,57 +1,18 @@
-[2025-10-30 11:37:55] USER_LOGIN: Successful login.
-[2025-10-30 11:38:23] ITEM_ADD: Added Iphone 17 Pro Max (SKU 002).
-[2025-10-30 11:38:37] USER_LOGOUT: Data saved and system exited.
-[2025-10-30 11:39:37] USER_LOGIN: Successful login.
-[2025-10-30 11:39:54] REPORT: Generated financial and operational report.
-[2025-10-30 11:46:46] USER_LOGOUT: Data saved and system exited.
-[2025-10-30 11:47:08] USER_LOGIN: Successful login.
-[2025-10-30 11:47:17] ORDERS: Viewed empty pending orders list.
-[2025-10-30 11:47:22] INVENTORY: Viewed inventory list.
-[2025-10-30 11:48:19] ORDER_ADD: Placed order 1002 for 10 units of SKU 001.
-[2025-10-30 11:48:30] ORDERS: Viewed pending orders list.
-[2025-10-30 11:48:40] ORDER_PROCESS: Invalid Order ID entered.
-[2025-10-30 11:48:52] ORDERS: Viewed pending orders list.
-[2025-10-30 11:51:17] USER_LOGIN: Successful login.
-[2025-10-30 11:51:31] ITEM_DELETE: Failed to find SKU for deletion.
-[2025-10-30 11:51:33] INVENTORY: Viewed inventory list.
-[2025-10-30 11:51:48] ITEM_ADD: Failed to add item (SKU exists).
-[2025-10-30 11:52:49] ITEM_ADD: Added Samsung Z-Fold (SKU 003).
-[2025-10-30 11:53:12] ORDERS: Viewed empty pending orders list.
-[2025-10-30 11:53:24] SEARCH: Successful search for SKU.
-[2025-10-30 11:53:32] REPORT: Generated financial and operational report.
-[2025-10-30 11:54:15] STOCK_IN: Failed to find SKU for update.
-[2025-10-30 11:55:01] DETAILS_UPDATE: Failed to find SKU.
-[2025-10-30 11:55:26] USER_LOGIN: Successful login.
-[2025-10-30 11:55:56] USER_LOGIN: Successful login.
-[2025-10-30 11:56:08] STOCK_IN: Failed to find SKU for update.
-[2025-10-30 11:56:12] ORDERS: Viewed empty pending orders list.
-[2025-10-30 12:00:35] USER_LOGIN: Successful login.
-[2025-10-30 12:00:57] STOCK_IN: Received 20 units of 002. New qty: 74.
-[2025-10-30 12:01:01] INVENTORY: Viewed inventory list.
-[2025-10-30 12:01:22] DETAILS_UPDATE: Updated name/price for SKU 001.
-[2025-10-30 12:01:48] ORDERS: Viewed empty pending orders list.
-[2025-10-30 12:04:14] USER_LOGIN: Successful login.
-[2025-10-30 12:04:55] ORDER_ADD: Placed order 1002 for 20 units of SKU 002.
-[2025-10-30 12:05:33] ORDERS: Viewed pending orders list.
-[2025-10-30 12:05:52] USER_LOGIN: Successful login.
-[2025-10-30 12:06:10] DETAILS_UPDATE: Updated name/price for SKU 001.
-[2025-10-30 12:06:15] ORDERS: Viewed empty pending orders list.
-[2025-10-30 12:06:23] INVENTORY: Viewed inventory list.
-[2025-10-30 12:06:58] ORDER_ADD: Placed order 1002 for 15 units of SKU 002.
-[2025-10-30 12:07:02] ORDERS: Viewed pending orders list.
-[2025-10-30 12:07:55] ORDER_ADD: Placed order 1003 for 10 units of SKU 001.
-[2025-10-30 12:08:23] ORDER_ADD: Placed order 1004 for 10 units of SKU 001.
-[2025-10-30 12:08:31] ORDERS: Viewed pending orders list.
-[2025-10-30 12:08:37] ORDERS: Viewed pending orders list.
-[2025-10-30 12:11:41] INVENTORY: Viewed inventory list.
-[2025-10-30 12:12:06] STOCK_IN: Received 10 units of 002. New qty: 64.
-[2025-10-30 12:15:59] USER_LOGOUT: Data saved and system exited.
-[2025-10-30 12:16:22] USER_LOGIN: Successful login.
-[2025-10-30 12:16:42] STOCK_IN: Received 30 units of 001. New qty: 50.
-[2025-10-30 12:19:25] USER_LOGOUT: Data saved and system exited.
-[2025-10-30 12:19:36] USER_LOGIN: Successful login.
-[2025-10-30 12:19:47] STOCK_IN: Received 10 units of 001. New qty: 60.
-[2025-10-30 12:20:30] ORDERS: Viewed pending orders list.
-[2025-10-30 12:20:48] ORDERS: Viewed pending orders list.
-[2025-10-30 12:21:00] REPORT: Generated financial and operational report.
-[2025-10-30 12:21:41] USER_LOGOUT: Data saved and system exited.
+[2025-10-30 15:25:46] USER_LOGIN: Successful login.
+[2025-10-30 15:33:21] USER_LOGIN: Successful login.
+[2025-10-30 15:34:43] USER_LOGIN: Successful login.
+[2025-10-30 15:35:12] ITEM_ADD: Added 15'' Gaming Laptop (SKU L002).
+[2025-10-30 15:39:44] USER_LOGIN: Successful login.
+[2025-10-30 15:41:06] ITEM_ADD: Added 15" Gaming Laptop (SKU L001).
+[2025-10-30 15:41:55] ITEM_ADD: Added 13" Ultra Book (SKU L002).
+[2025-10-30 15:44:56] REPORT: Generated financial and operational report.
+[2025-10-30 15:45:05] USER_LOGOUT: Data saved and system exited.
+[2025-10-30 16:11:44] USER_LOGIN: Successful login.
+[2025-10-30 16:12:06] USER_LOGOUT: Data saved and session ended for switch.
+[2025-10-30 16:12:39] USER_LOGIN: Successful login.
+[2025-10-30 16:16:31] USER_LOGOUT: Data saved and system exited.
+[2025-10-30 16:16:53] USER_LOGIN: Successful login.
+[2025-10-30 16:17:12] USER_MANAGEMENT: Failed attempt to add user (Bad MAIN Admin Pass).
+[2025-10-30 16:17:21] USER_MANAGEMENT: Failed attempt to add user (Bad MAIN Admin Pass).
+[2025-10-30 16:20:28] USER_LOGIN: Successful login.
+[2025-10-30 16:20:30] USER_LOGOUT: Data saved and session ended for switch.

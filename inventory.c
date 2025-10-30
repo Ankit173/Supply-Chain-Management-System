@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h> 
+#include <ctype.h> // For strcasecmp
 
 // --- System Constants ---
 #define MAX_ITEMS 100
@@ -13,10 +14,12 @@
 #define USER_FILE "users.txt" 
 
 // --- Credentials & Logs ---
-#define ADMIN_ID "Admin" 
-#define ADMIN_PASS "1234" 
+#define ADMIN_ID "Admin"             // Default initial user ID
+#define ADMIN_PASS "1234"            // Default initial user password (used only if users.txt is empty)
+#define MAIN_ADMIN_PASS "54321"      // NEW: High-security password for adding users
 #define MAX_LOGIN_ATTEMPTS 3
 char loggedInUser[MAX_NAME_LEN] = ""; 
+int programStatus = 1; // 1: Running, 0: Exit, 2: Switch User
 
 // --- Structures ---
 typedef struct {
@@ -50,6 +53,8 @@ void addUser();
 void processMultipleOrders(); 
 int findItemIndex(const char* sku);
 int findOrderIndex(int orderID);
+void switchUser(); 
+void runMainMenu(); 
 
 void loadInventory();
 void saveInventory();
@@ -75,6 +80,7 @@ int checkCredentials(const char* username, const char* password) {
     FILE *file = fopen(USER_FILE, "r");
     
     if (file == NULL) {
+        // Fallback to hardcoded admin if file is missing
         if (strcmp(username, ADMIN_ID) == 0 && strcmp(password, ADMIN_PASS) == 0) {
             return 1; 
         }
@@ -132,11 +138,16 @@ int adminLogin() {
     while (attempts < MAX_LOGIN_ATTEMPTS) {
         printf("Attempt %d of %d:\n", attempts + 1, MAX_LOGIN_ATTEMPTS);
         
-        printf("  Enter Username: ");
+        printf("  Enter Username (or type 'EXIT' to quit): ");
         if (scanf("%s", input_id) != 1) {
              while(getchar() != '\n');
              attempts++;
              continue;
+        }
+
+        if (strcasecmp(input_id, "EXIT") == 0 || strcasecmp(input_id, "E") == 0) {
+            printf("\nLogin attempt cancelled. Exiting program.\n");
+            return -1; 
         }
         
         printf("  Enter Password: ");
@@ -160,30 +171,29 @@ int adminLogin() {
     }
     
     printf("\n*** Maximum login attempts reached. Program exiting. ***\n");
-    return 0;
+    return 0; 
 }
 
 void addUser() {
-    char admin_username[MAX_NAME_LEN];
-    char admin_password[MAX_NAME_LEN];
+    char admin_password_input[MAX_NAME_LEN]; // Input buffer for the MAIN_ADMIN_PASS
     char new_username[MAX_NAME_LEN];
     char new_password[MAX_NAME_LEN];
     
-    printf("\n--- Add New User (Admin Approval Required) ---\n");
+    printf("\n--- Add New User (High Security Approval Required) ---\n");
     
-    printf("--- ADMIN APPROVAL ---\n");
-    printf("Enter CURRENT Admin/User Username: ");
-    if (scanf("%s", admin_username) != 1) return;
-    printf("Enter CURRENT Admin/User Password: ");
-    if (scanf("%s", admin_password) != 1) return;
+    // 1. High-Security Admin Approval Check (Requires MAIN_ADMIN_PASS)
+    printf("--- SECURITY APPROVAL ---\n");
+    printf("Enter MAIN Admin Password:" );
+    if (scanf("%s", admin_password_input) != 1) return;
     
-    if (!checkCredentials(admin_username, admin_password)) {
-        printf("\n*** ACCESS DENIED: Invalid Admin credentials. User not added. ***\n");
-        logAction("USER_MANAGEMENT: Failed attempt to add user (Bad Admin Auth).");
+    if (strcmp(admin_password_input, MAIN_ADMIN_PASS) != 0) {
+        printf("\n*** ACCESS DENIED: Invalid MAIN Admin Password. User not added. ***\n");
+        logAction("USER_MANAGEMENT: Failed attempt to add user (Bad MAIN Admin Pass).");
         return;
     }
     printf("--- Approval Granted ---\n");
     
+    // 2. New User Details
     printf("Enter new username: ");
     if (scanf("%s", new_username) != 1) return;
     
@@ -198,6 +208,7 @@ void addUser() {
     
     while(getchar() != '\n'); 
 
+    // 3. Write to file
     FILE *file = fopen(USER_FILE, "a");
     if (file == NULL) {
         printf("*** Error: Could not open user file for writing! ***\n");
@@ -214,18 +225,27 @@ void addUser() {
 }
 
 // ---------------------------------------------------------------------
-// --- Main Function ---
+// --- Main Function (RESTRUCTURED) ---
 // ---------------------------------------------------------------------
-int main() {
+
+void switchUser() {
+    saveInventory(); 
+    saveOrders(); 
+    printf("\n--- User session saved and logged out. ---\n");
+    logAction("USER_LOGOUT: Data saved and session ended for switch.");
+    
+    // Set flag to restart the login process in the outer loop
+    programStatus = 2; 
+}
+
+void runMainMenu() {
     int choice;
     
-    if (!adminLogin()) {
-        return 0;
-    }
-
+    // 1. Load Data
     loadInventory(); 
     loadOrders(); 
 
+    // 2. Main Menu Loop
     do {
         displayMenu();
         printf("Enter your choice: ");
@@ -239,26 +259,49 @@ int main() {
         switch (choice) {
             case 1: viewInventory(); break;
             case 2: addItem(); break;
-            case 3: recordIncomingStock(); break; // Looping function
+            case 3: recordIncomingStock(); break;
             case 4: updateDetails(); break;
             case 5: deleteProduct(); break;
             case 6: viewPendingOrders(); break;
-            case 7: addNewOrder(); break; // Looping function
+            case 7: addNewOrder(); break; 
             case 8: processOrder(); break;
             case 9: processMultipleOrders(); break; 
             case 10: searchProduct(); break;
             case 11: generateReports(); break;
             case 12: addUser(); break; 
             case 13: 
+                switchUser(); // Sets programStatus = 2
+                break;
+            case 14: 
                 saveInventory(); 
                 saveOrders(); 
                 printf("\nData saved successfully! Exiting Inventory Tracker.\n");
                 logAction("USER_LOGOUT: Data saved and system exited.");
+                programStatus = 0; // Set flag to terminate
                 break;
             default:
                 printf("\n\n*** Invalid choice. Please try again. ***\n\n");
         }
-    } while (choice != 13); 
+    } while (programStatus == 1); // Loop runs until user exits (0) or switches (2)
+}
+
+
+int main() {
+    // Outer loop runs until the user chooses to exit (programStatus = 0)
+    do {
+        programStatus = 1; // Reset status for the new session
+        
+        int login_status = adminLogin();
+
+        if (login_status == 1) {
+            runMainMenu(); // Start the main application loop
+        } else if (login_status == -1) {
+            return 0; // Exit if user types 'EXIT' at login
+        } else if (login_status == 0) {
+            return 0; // Exit if login attempts fail
+        }
+        
+    } while (programStatus == 2); // Loop again if a switch (2) was requested
 
     return 0;
 }
@@ -429,7 +472,8 @@ void displayMenu() {
     printf("10. Search Product by ID (SKU)\n");               
     printf("11. Generate Reports\n");                         
     printf("12. Add New User\n");                             
-    printf("13. *Save Data & Exit*\n");                       
+    printf("13. Switch User\n");                              // Shifted to 13
+    printf("14. *Save Data & Exit*\n");                       // Shifted to 14
     printf("--------------------------------------------\n");
 }
 
@@ -459,50 +503,66 @@ void viewInventory() {
 }
 
 void addItem() {
-    if (itemCount >= MAX_ITEMS) {
-        printf("\n*** Inventory is full. Cannot add more items. ***\n");
-        logAction("ITEM_ADD: Failed to add item (Inventory full).");
-        return;
-    }
+    char sku_to_check[MAX_SKU_LEN];
 
-    InventoryItem newItem;
-    char temp_sku[MAX_SKU_LEN];
+    printf("\n--- Add New Item (Continuous Entry) ---\n");
     
-    printf("\n--- Add New Item ---\n");
-    printf("Enter Item SKU (max %d chars): ", MAX_SKU_LEN - 1);
-    if (scanf("%s", temp_sku) != 1) return;
-    
-    if (findItemIndex(temp_sku) != -1) {
-        printf("*** Error: Item with SKU '%s' already exists. ***\n", temp_sku);
-        logAction("ITEM_ADD: Failed to add item (SKU exists).");
-        return;
-    }
-    strcpy(newItem.sku, temp_sku);
+    do {
+        if (itemCount >= MAX_ITEMS) {
+            printf("\n*** Inventory is full. Cannot add more items. ***\n");
+            logAction("ITEM_ADD: Failed to add item (Inventory full).");
+            break;
+        }
 
-    printf("Enter Item Name (max %d chars): ");
-    while(getchar() != '\n'); 
-    if (fgets(newItem.name, MAX_NAME_LEN, stdin) != NULL) {
-        newItem.name[strcspn(newItem.name, "\n")] = 0;
-    }
+        InventoryItem newItem;
+        char temp_sku[MAX_SKU_LEN];
 
-    printf("Enter Initial Quantity: ");
-    if (scanf("%d", &newItem.quantity) != 1 || newItem.quantity < 0) {
-        printf("*** Error: Invalid quantity entered. ***\n");
-        return;
-    }
+        printf("\n--- Next Product Entry ---\n");
+        printf("Enter Item SKU (max %d chars, or type 'E' to Exit): ", MAX_SKU_LEN - 1);
+        if (scanf("%s", temp_sku) != 1) continue;
 
-    printf("Enter Unit Price: Rs.");
-    if (scanf("%lf", &newItem.price) != 1 || newItem.price < 0) {
-        printf("*** Error: Invalid price entered. ***\n");
-        return;
-    }
+        // Exit condition check
+        if (strcasecmp(temp_sku, "E") == 0) {
+            break;
+        }
 
-    inventory[itemCount] = newItem;
-    itemCount++;
-    printf("\nSuccessfully added item: %s (SKU: %s) with %d units.\n", newItem.name, newItem.sku, newItem.quantity);
-    char log_msg[100];
-    snprintf(log_msg, 100, "ITEM_ADD: Added %s (SKU %s).", newItem.name, newItem.sku);
-    logAction(log_msg);
+        if (findItemIndex(temp_sku) != -1) {
+            printf("*** Error: Item with SKU '%s' already exists. ***\n", temp_sku);
+            while(getchar() != '\n');
+            continue;
+        }
+        strcpy(newItem.sku, temp_sku);
+
+        printf("Enter Item Name (max %d chars): ", MAX_NAME_LEN - 1);
+        while(getchar() != '\n'); 
+        if (fgets(newItem.name, MAX_NAME_LEN, stdin) != NULL) {
+            newItem.name[strcspn(newItem.name, "\n")] = 0;
+        }
+
+        printf("Enter Initial Quantity: ");
+        if (scanf("%d", &newItem.quantity) != 1 || newItem.quantity < 0) {
+            printf("*** Error: Invalid quantity entered. ***\n");
+            while(getchar() != '\n');
+            continue;
+        }
+
+        printf("Enter Unit Price: Rs.");
+        if (scanf("%lf", &newItem.price) != 1 || newItem.price < 0) {
+            printf("*** Error: Invalid price entered. ***\n");
+            while(getchar() != '\n');
+            continue;
+        }
+
+        inventory[itemCount] = newItem;
+        itemCount++;
+        printf("\n✅ Successfully added item: %s (SKU: %s) with %d units.\n", newItem.name, newItem.sku, newItem.quantity);
+        char log_msg[100];
+        snprintf(log_msg, 100, "ITEM_ADD: Added %s (SKU %s).", newItem.name, newItem.sku);
+        logAction(log_msg);
+
+    } while (1);
+
+    printf("\n--- Exited Add New Item Section. ---\n");
 }
 
 void recordIncomingStock() {
@@ -530,7 +590,7 @@ void recordIncomingStock() {
         if (scanf("%s", sku_to_find) != 1) continue;
         
         // Exit condition check
-        if (strcmp(sku_to_find, "E") == 0 || strcmp(sku_to_find, "e") == 0) {
+        if (strcasecmp(sku_to_find, "E") == 0) {
             break;
         }
         
@@ -592,8 +652,9 @@ void updateDetails() {
     printf("Enter SKU of the item to update (or type 'E' to Exit): ");
     if (scanf("%s", sku_to_update) != 1) return;
     
-    // Exit condition check
-    if (strcmp(sku_to_update, "E") == 0 || strcmp(sku_to_update, "e") == 0) {
+    // Exit condition check (FIXED)
+    if (strcasecmp(sku_to_update, "E") == 0) {
+        while(getchar() != '\n'); // Clear buffer
         printf("\n--- Exited Update Product Details Section. ---\n");
         return;
     }
@@ -661,8 +722,9 @@ void deleteProduct() {
     printf("Enter SKU of the item to DELETE (or type 'E' to Exit): ");
     if (scanf("%s", sku_to_delete) != 1) return;
     
-    // Exit condition check
-    if (strcmp(sku_to_delete, "E") == 0 || strcmp(sku_to_delete, "e") == 0) {
+    // Exit condition check (FIXED)
+    if (strcasecmp(sku_to_delete, "E") == 0) {
+        while(getchar() != '\n'); // Clear buffer
         printf("\n--- Exited Delete Product Section. ---\n");
         return;
     }
@@ -764,7 +826,7 @@ void addNewOrder() {
         if (scanf("%s", sku_to_check) != 1) continue;
         
         // Exit condition check
-        if (strcmp(sku_to_check, "E") == 0 || strcmp(sku_to_check, "e") == 0) {
+        if (strcasecmp(sku_to_check, "E") == 0) {
             break;
         }
 
@@ -872,7 +934,7 @@ void processMultipleOrders() {
     char* token;
     int orders_dispatched = 0;
     
-    printf("\n--- Process Multiple Orders (Batch Dispatch) ---\n");
+    printf("\n--- Process Multiple Orders (Dispatch Batch) ---\n");
     viewPendingOrders(); 
 
     printf("\n>>> Enter the ORDER IDs to dispatch, separated by spaces (e.g., 1001 1005 1010):\n>>> ");
